@@ -4,10 +4,6 @@ require("dotenv").config(); //read the MONGO environment variable from the .env 
 require("./config/db").connect();
 
 const apiRoutes = require("./routes");
-const authRoute = require("./routes/auth.js");
-const petsRoute = require("./routes/pets.js");
-const usersRoute = require("./routes/users.js");
-
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
@@ -24,9 +20,6 @@ app.get("/", (req, res) => {
 
 //MIDLLEWARES
 app.use("/api", apiRoutes());
-app.use("/api/auth", authRoute());
-app.use("/api/users", usersRoute());
-app.use("/api/pets", petsRoute());
 
 const PORT = process.env.PORT;
 

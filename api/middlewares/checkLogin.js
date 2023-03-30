@@ -5,12 +5,12 @@ require("dotenv").config();
 const checkLogin = async (req, res, next) => {
   if (req.headers.authorization) {
     const token = req.headers.authorization;
-    console.log(token);
+    //console.log(token);
     const decoded = jwt.decode(token, process.env.TOKEN_KEY);
     if (!decoded) {
       return res.status(401).send("Ivalid token");
     }
-    console.log(decoded);
+    //console.log(decoded);
     const result = await User.findOne({ email: decoded.email });
     if (!result) {
       return res.status(401).json({ access: "Not allowed" });
@@ -21,5 +21,7 @@ const checkLogin = async (req, res, next) => {
     return res.status(401).send("No token provided");
   }
 };
+
+const checkRole = async (req, res, nex) => {};
 
 module.exports = checkLogin;
