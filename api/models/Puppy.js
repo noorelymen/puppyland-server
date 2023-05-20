@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const PetSchema = new mongoose.Schema({
+const PuppySchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -10,11 +10,11 @@ const PetSchema = new mongoose.Schema({
     min: 0,
     max: 50,
   },
-  gender: {
-    type: String,
+  birthday: {
+    type: Date,
     required: true,
   },
-  category: {
+  gender: {
     type: String,
     required: true,
   },
@@ -46,20 +46,16 @@ const PetSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  address: {
-    type: String,
-    required: true,
-  },
-  distance: {
-    type: String,
-    required: true,
-  },
   featured: {
     type: Boolean,
     required: true,
   },
+  available: {
+    type: Boolean,
+    default: true,
+  },
 });
 
-//export default mongoose.model("Pet", PetSchema);
-const Pet = mongoose.model("Pet", PetSchema);
-module.exports = Pet;
+//export default mongoose.model("Puppy", PuppySchema);
+const Puppy = mongoose.model("Puppy", PuppySchema);
+module.exports = Puppy;

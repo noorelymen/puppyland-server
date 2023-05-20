@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const AuthController = require("../controllers/AuthController");
-const checkLogin = require("../middlewares/checkLogin");
+const { login, role } = require("../middlewares/check");
 
 module.exports = () => {
   //REGISTER A NEW USER
@@ -11,8 +11,12 @@ module.exports = () => {
   //LOG IN AN EXISTING USER
   router.post("/login", AuthController.login);
 
-  router.get("/verifytoken", checkLogin, (req, res) => {
-    res.status(200).send("Authorized");
+  router.get("/verifylogin", login, (req, res) => {
+    res.status(200).send("you are logged in");
+  });
+
+  router.get("/verifyrole", role, (req, res) => {
+    res.status(200).send("you are logged in and an admin");
   });
 
   return router;

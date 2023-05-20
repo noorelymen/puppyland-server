@@ -10,6 +10,6 @@ exports.connect = async () => {
     });
     console.log(`Connected to database ${dbConn.connections[0].name}`);
   } catch (err) {
-    console.log(`Error conecting to db: ${err.message}`);
+    console.log(`Error conecting to DB: ${err.message}`);
   }
 };

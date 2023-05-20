@@ -5,15 +5,15 @@ const jwt = require("jsonwebtoken");
 // REGISTER CONTROLLER
 exports.register = async (req, res) => {
   try {
-    // get user info from req.body
+    // Get user info from req.body
     const { firstname, lastname, username, email, password } = req.body;
 
-    // validations
+    // Validations
     if (!(email && password && firstname && lastname && username)) {
       return res.status(400).send("All register fields are required");
     }
 
-    //verify if it is an old user
+    // Verify if it is an existing user
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(409).send("User already exist please sign in.");
@@ -27,8 +27,8 @@ exports.register = async (req, res) => {
       expiresIn: "2h",
     });
 
-    // save our user
-    const savedUser = await User.create({
+    // Save the user
+    const newUser = await User.create({
       email,
       password: encryptedPassword,
       firstname,
@@ -37,18 +37,18 @@ exports.register = async (req, res) => {
       token,
     });
 
-    // send response
+    // Send response
     res.status(201).json({
       msg: "User created successfully",
       user: {
-        email: savedUser.email,
-        firstname: savedUser.firstname,
-        lastname: savedUser.lastname,
-        username: savedUser.username,
-        role: savedUser.role,
-        createdAt: savedUser.createdAt,
-        updatedAt: savedUser.updatedAt,
-        token: savedUser.token,
+        email: newUser.email,
+        firstname: newUser.firstname,
+        lastname: newUser.lastname,
+        username: newUser.username,
+        role: newUser.role,
+        createdAt: newUser.createdAt,
+        updatedAt: newUser.updatedAt,
+        token: newUser.token,
       },
     });
   } catch (err) {
@@ -61,28 +61,32 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // validation
+    // Validations
     if (!(email && password)) {
       return res.status(400).send("All fields are required");
     }
 
-    // VALIDATE if user exits in database
+    // Verify if user exits in database
     const user = await User.findOne({ email });
 
-    //COMPARE TYPED AND REGISTERED   PASSWORDS
+    // Compare entered and registered passwords
     if (user && (await bcrypt.compare(password, user.password))) {
-      // generate token
-
+      // Generate token
       const token = jwt.sign({ email: user.email }, process.env.TOKEN_KEY, {
         expiresIn: "2h",
       });
 
       user.token = token;
 
-      res.status(200).json({
-        msg: "User logged in successfully",
-        token: user.token,
-      });
+      res
+        // .cookie("access_token", token, {
+        //   httpOnly: true,
+        // })
+        .status(200)
+        .json({
+          msg: "User logged in successfully",
+          token: user.token,
+        });
     } else {
       return res.status(401).send("Incorrect email or password");
     }
@@ -90,3 +94,54 @@ exports.login = async (req, res) => {
     res.status(500).send(err.message);
   }
 };
+
+// LAMA DEV
+// import User from "../models/User.js";
+// import bcrypt from "bcryptjs";
+// import { createError } from "../utils/error.js";
+// import jwt from "jsonwebtoken";
+
+// export const register = async (req, res, next) => {
+//   try {
+//     const salt = bcrypt.genSaltSync(10);
+//     const hash = bcrypt.hashSync(req.body.password, salt);
+
+//     const newUser = new User({
+//       ...req.body,
+//       password: hash,
+//     });
+
+//     await newUser.save();
+//     res.status(200).send("User has been created.");
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+// export const login = async (req, res, next) => {
+//   try {
+//     const user = await User.findOne({ username: req.body.username });
+//     if (!user) return next(createError(404, "User not found!"));
+
+//     const isPasswordCorrect = await bcrypt.compare(
+//       req.body.password,
+//       user.password
+//     );
+//     if (!isPasswordCorrect)
+//       return next(createError(400, "Wrong password or username!"));
+
+//     const token = jwt.sign(
+//       { id: user._id, isAdmin: user.isAdmin },
+//       process.env.JWT
+//     );
+
+//     const { password, isAdmin, ...otherDetails } = user._doc;
+//     res
+//       .cookie("access_token", token, {
+//         httpOnly: true,
+//       })
+//       .status(200)
+//       .json({ details: { ...otherDetails }, isAdmin });
+//   } catch (err) {
+//     next(err);
+//   }
+// };

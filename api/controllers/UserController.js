@@ -36,7 +36,6 @@ exports.getUserById = async (req, res, next) => {
 
 //GET ALL USERS
 exports.getAllUsers = async (req, res, next) => {
-  console.warn("Hey");
   try {
     const users = await User.find();
     res.status(200).json({
