@@ -5,14 +5,16 @@ require("./config/db").connect();
 
 const apiRoutes = require("./routes");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true })); // third partie middleware
 app.use(bodyParser.json());
+app.use(cookieParser());
 
-app.use(cors());
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 //MIDLLEWARES
 app.use("/api", apiRoutes());

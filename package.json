@@ -1,8 +1,8 @@
 {
-  "name": "Puppypal",
+  "name": "Puppypland",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node api/server.js",
     "dev": "nodemon api/server.js",
@@ -14,11 +14,13 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.2",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "react-toastify": "^9.1.3"
   }
 }

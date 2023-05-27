@@ -54,6 +54,10 @@ const PuppySchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  userId: {
+    type: String,
+    required: true,
+  },
 });
 
 //export default mongoose.model("Puppy", PuppySchema);

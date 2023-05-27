@@ -11,12 +11,18 @@ module.exports = () => {
   //LOG IN AN EXISTING USER
   router.post("/login", AuthController.login);
 
+  //LOGOUT A LOGGED IN USER
+  router.post("/logout", AuthController.logout);
+
+  //LOGOUT AN EXISTING USER
+  //router.post("/logout", AuthController.logout);
+
   router.get("/verifylogin", login, (req, res) => {
-    res.status(200).send("you are logged in");
+    res.status(200).send("You are logged in");
   });
 
   router.get("/verifyrole", role, (req, res) => {
-    res.status(200).send("you are logged in and an admin");
+    res.status(200).send("You are logged in and an admin");
   });
 
   return router;

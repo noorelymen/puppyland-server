@@ -4,19 +4,19 @@ const { login, role } = require("../middlewares/check");
 const PuppyController = require("../controllers/PuppyController");
 
 module.exports = () => {
-  //GET ALL PuppyS
+  //GET ALL PUPPIES
   router.get("/", PuppyController.getAllPuppies);
 
-  //GET Puppy BY ID
+  //GET PUPPY BY ID
   router.get("/:id", PuppyController.getPuppyById);
 
-  //ADD NEW Puppy
+  //ADD NEW PUPPY
   router.post("/", login, role, PuppyController.addNewPuppy);
 
-  //UPDATE Puppy
-  router.put("/:id", PuppyController.updatePuppy);
+  //UPDATE PUPPY
+  router.put("/:id", login, role, PuppyController.updatePuppy);
 
-  //DELETE Puppy
+  //DELETE PUPPY
   router.delete("/:id", login, role, PuppyController.deletePuppy);
 
   return router;

@@ -1,17 +1,35 @@
 const mongoose = require("mongoose");
 
 const AdoptionSchema = new mongoose.Schema({
-  user: {
+  ownerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
     unique: true,
   },
-  puppy: {
+  adopterId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    unique: true,
+  },
+  puppyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Puppy",
     required: true,
     unique: true,
+  },
+  img: {
+    type: String,
+    required: false,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  breed: {
+    type: String,
+    required: true,
   },
   status: {
     type: String,

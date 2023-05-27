@@ -1,12 +1,20 @@
 const Puppy = require("../models/Puppy");
+const createError = require("../utils/error");
 
 //CREATE A NEW PUPPY
 exports.addNewPuppy = async (req, res, next) => {
   //create a new Puppy
-  const newPuppy = new Puppy(req.body);
+  if (!req.isOwner)
+    return next(createError(403), "Only rescuers can add new pets.");
+
+  const newPuppy = new Puppy({
+    userId: req.userId,
+    ...req.body,
+  });
+
   try {
     const savedPuppy = await newPuppy.save();
-    res.status(200).json(savedPuppy);
+    next(createError(200), savedPuppy);
   } catch (err) {
     next(err);
   }

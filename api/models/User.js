@@ -24,12 +24,44 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    token: {
+    img: {
       type: String,
+      required: false,
+    },
+    city: {
+      type: String,
+      required: false,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    desc: {
+      type: String,
+      required: false,
+    },
+    isOwner: {
+      type: Boolean,
+      default: false,
+    },
+    memberSince: {
+      type: String,
+      required: false,
+    },
+    rescuedPuppies: {
+      type: Number,
+      required: false,
+    },
+    rating: {
+      type: Number,
+      required: false,
     },
     role: {
       type: String,
       default: "user",
+    },
+    token: {
+      type: String,
     },
   },
   { timestamps: true }

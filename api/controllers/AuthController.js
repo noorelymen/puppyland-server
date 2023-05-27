@@ -1,22 +1,38 @@
 const User = require("../models/User");
+const createError = require("../utils/error");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // REGISTER CONTROLLER
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
   try {
     // Get user info from req.body
-    const { firstname, lastname, username, email, password } = req.body;
+    const {
+      firstname,
+      lastname,
+      username,
+      email,
+      password,
+      phone,
+      img,
+      city,
+      desc,
+      isOwner,
+      memberSince,
+      rescuedPuppies,
+      rating,
+      role,
+    } = req.body;
 
     // Validations
-    if (!(email && password && firstname && lastname && username)) {
-      return res.status(400).send("All register fields are required");
+    if (!(email && password && firstname && lastname && username && phone)) {
+      return next(createError(400, "All register fields are required"));
     }
 
     // Verify if it is an existing user
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(409).send("User already exist please sign in.");
+      return next(createError(409, "User already exist please sign in."));
     }
 
     // Encrypt user password
@@ -29,11 +45,20 @@ exports.register = async (req, res) => {
 
     // Save the user
     const newUser = await User.create({
-      email,
-      password: encryptedPassword,
       firstname,
       lastname,
       username,
+      email,
+      password: encryptedPassword,
+      phone,
+      img,
+      city,
+      desc,
+      isOwner,
+      memberSince,
+      rescuedPuppies,
+      rating,
+      role,
       token,
     });
 
@@ -41,10 +66,18 @@ exports.register = async (req, res) => {
     res.status(201).json({
       msg: "User created successfully",
       user: {
-        email: newUser.email,
         firstname: newUser.firstname,
         lastname: newUser.lastname,
         username: newUser.username,
+        email: newUser.email,
+        phone: newUser.phone,
+        img: newUser.img,
+        city: newUser.city,
+        desc: newUser.desc,
+        isOwner: newUser.isOwner,
+        memberSince: newUser.memberSince,
+        rescuedPuppies: newUser.rescuedPuppies,
+        rating: newUser.rating,
         role: newUser.role,
         createdAt: newUser.createdAt,
         updatedAt: newUser.updatedAt,
@@ -52,47 +85,70 @@ exports.register = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).send(err.message);
+    next(err);
   }
 };
 
 // LOGIN CONTROLLER
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     // Validations
-    if (!(email && password)) {
-      return res.status(400).send("All fields are required");
+    if (!(username && password)) {
+      return next(createError(400, "Username and password Required!"));
     }
 
     // Verify if user exits in database
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
+    if (!user) return next(createError(404, "User not found!"));
 
     // Compare entered and registered passwords
     if (user && (await bcrypt.compare(password, user.password))) {
       // Generate token
-      const token = jwt.sign({ email: user.email }, process.env.TOKEN_KEY, {
-        expiresIn: "2h",
-      });
+      const token = jwt.sign(
+        {
+          id: user._id,
+          username: user.username,
+          isOwner: user.isOwner,
+          isAdopter: user.isAdopter,
+        },
+        process.env.TOKEN_KEY,
+        { expiresIn: "2h" }
+      );
 
       user.token = token;
 
       res
-        // .cookie("access_token", token, {
-        //   httpOnly: true,
-        // })
+        .cookie("accessToken", token, {
+          httpOnly: true, //we can only change the token using http requests
+        })
         .status(200)
         .json({
           msg: "User logged in successfully",
           token: user.token,
+          id: user._id,
+          firstname: user.firstname,
+          img: user.img,
         });
     } else {
-      return res.status(401).send("Incorrect email or password");
+      return next(createError(401, "Wrong username or password!"));
     }
   } catch (err) {
-    res.status(500).send(err.message);
+    next(err);
   }
+};
+
+// LOGOUT
+
+exports.logout = async (req, res, next) => {
+  res
+    .clearCookie("accessToken", {
+      sameSite: "none",
+      secure: true,
+    })
+    .status(200)
+    .send("User has been logged out.");
 };
 
 // LAMA DEV
@@ -112,9 +168,10 @@ exports.login = async (req, res) => {
 //     });
 
 //     await newUser.save();
-//     res.status(200).send("User has been created.");
+//     res.status(201).send("User has been created.");
 //   } catch (err) {
-//     next(err);
+//     res.status(500).send("Something went wrong");
+//     next(createError(,""));
 //   }
 // };
 // export const login = async (req, res, next) => {
@@ -122,7 +179,7 @@ exports.login = async (req, res) => {
 //     const user = await User.findOne({ username: req.body.username });
 //     if (!user) return next(createError(404, "User not found!"));
 
-//     const isPasswordCorrect = await bcrypt.compare(
+//     const isPasswordCorrect = await bcrypt.compareSync(
 //       req.body.password,
 //       user.password
 //     );
@@ -130,18 +187,18 @@ exports.login = async (req, res) => {
 //       return next(createError(400, "Wrong password or username!"));
 
 //     const token = jwt.sign(
-//       { id: user._id, isAdmin: user.isAdmin },
+//       { id: user._id, isOwner: user.isOwner },
 //       process.env.JWT
 //     );
 
-//     const { password, isAdmin, ...otherDetails } = user._doc;
+//     const { password, isOwner, ...otherDetails } = user._doc;
 //     res
-//       .cookie("access_token", token, {
+//       .cookie("accessToken", token, {
 //         httpOnly: true,
 //       })
 //       .status(200)
-//       .json({ details: { ...otherDetails }, isAdmin });
+//       .json({ details: { ...otherDetails }, isOwner });
 //   } catch (err) {
-//     next(err);
+//     next(createError(,""));
 //   }
 // };

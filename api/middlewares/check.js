@@ -1,28 +1,30 @@
 const User = require("../models/User");
+const createError = require("../utils/error");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 exports.login = async (req, res, next) => {
-  if (req.headers.authorization) {
-    const token = req.headers.authorization;
+  if (req.cookies.accessToken) {
+    const token = req.cookies.accessToken;
+    // const token = req.headers.authorization;
     if (!token) {
-      return res.status(401).send("You are not authenticated");
+      return next(createError(401, "You are not authenticated."));
     }
 
     try {
       const decoded = jwt.verify(token, process.env.TOKEN_KEY);
-      const result = await User.findOne({ email: decoded.email });
+      const result = await User.findOne({ username: decoded.username });
       if (!result) {
-        return res.status(401).json({ access: "Not allowed" });
+        return next(createError(401, "You are not allowed"));
       } else {
         req.user = result;
         return next();
       }
     } catch (error) {
-      return res.status(403).send("Invalid token");
+      return next(createError(403, "Invalid token"));
     }
   } else {
-    return res.status(401).send("No token provided");
+    return next(createError(401, "No token provided"));
   }
 };
 
@@ -30,12 +32,12 @@ exports.role = async (req, res, next) => {
   try {
     await exports.login(req, res, () => {}); // Call login middleware to check if user is authenticated
     if (req.user.role !== "admin") {
-      return res.status(403).send("You are not an admin!");
+      return next(createError(403, "You are not allowed!"));
     } else {
       return next();
     }
   } catch (error) {
-    return res.status(401).send("You are not logged in");
+    return next(createError(401, "You are not logged in"));
   }
 };
 
