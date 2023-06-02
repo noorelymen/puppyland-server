@@ -22,7 +22,7 @@ module.exports = () => {
   });
 
   router.get("/verifyrole", role, (req, res) => {
-    res.status(200).send("You are logged in and an admin");
+    res.status(200).send("You are logged in and a Rescuer");
   });
 
   return router;

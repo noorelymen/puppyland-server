@@ -17,7 +17,7 @@ exports.register = async (req, res, next) => {
       img,
       city,
       desc,
-      isOwner,
+      isRescuer,
       memberSince,
       rescuedPuppies,
       rating,
@@ -54,7 +54,7 @@ exports.register = async (req, res, next) => {
       img,
       city,
       desc,
-      isOwner,
+      isRescuer,
       memberSince,
       rescuedPuppies,
       rating,
@@ -74,7 +74,7 @@ exports.register = async (req, res, next) => {
         img: newUser.img,
         city: newUser.city,
         desc: newUser.desc,
-        isOwner: newUser.isOwner,
+        isRescuer: newUser.isRescuer,
         memberSince: newUser.memberSince,
         rescuedPuppies: newUser.rescuedPuppies,
         rating: newUser.rating,
@@ -110,8 +110,7 @@ exports.login = async (req, res, next) => {
         {
           id: user._id,
           username: user.username,
-          isOwner: user.isOwner,
-          isAdopter: user.isAdopter,
+          isRescuer: user.isRescuer,
         },
         process.env.TOKEN_KEY,
         { expiresIn: "2h" }
@@ -130,6 +129,7 @@ exports.login = async (req, res, next) => {
           id: user._id,
           firstname: user.firstname,
           img: user.img,
+          isRescuer: user.isRescuer,
         });
     } else {
       return next(createError(401, "Wrong username or password!"));
@@ -150,55 +150,3 @@ exports.logout = async (req, res, next) => {
     .status(200)
     .send("User has been logged out.");
 };
-
-// LAMA DEV
-// import User from "../models/User.js";
-// import bcrypt from "bcryptjs";
-// import { createError } from "../utils/error.js";
-// import jwt from "jsonwebtoken";
-
-// export const register = async (req, res, next) => {
-//   try {
-//     const salt = bcrypt.genSaltSync(10);
-//     const hash = bcrypt.hashSync(req.body.password, salt);
-
-//     const newUser = new User({
-//       ...req.body,
-//       password: hash,
-//     });
-
-//     await newUser.save();
-//     res.status(201).send("User has been created.");
-//   } catch (err) {
-//     res.status(500).send("Something went wrong");
-//     next(createError(,""));
-//   }
-// };
-// export const login = async (req, res, next) => {
-//   try {
-//     const user = await User.findOne({ username: req.body.username });
-//     if (!user) return next(createError(404, "User not found!"));
-
-//     const isPasswordCorrect = await bcrypt.compareSync(
-//       req.body.password,
-//       user.password
-//     );
-//     if (!isPasswordCorrect)
-//       return next(createError(400, "Wrong password or username!"));
-
-//     const token = jwt.sign(
-//       { id: user._id, isOwner: user.isOwner },
-//       process.env.JWT
-//     );
-
-//     const { password, isOwner, ...otherDetails } = user._doc;
-//     res
-//       .cookie("accessToken", token, {
-//         httpOnly: true,
-//       })
-//       .status(200)
-//       .json({ details: { ...otherDetails }, isOwner });
-//   } catch (err) {
-//     next(createError(,""));
-//   }
-// };

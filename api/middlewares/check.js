@@ -6,13 +6,16 @@ require("dotenv").config();
 exports.login = async (req, res, next) => {
   if (req.cookies.accessToken) {
     const token = req.cookies.accessToken;
-    // const token = req.headers.authorization;
+
     if (!token) {
       return next(createError(401, "You are not authenticated."));
     }
 
     try {
       const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+      if (!decoded) {
+        return res.status(401).send("Ivalid token");
+      }
       const result = await User.findOne({ username: decoded.username });
       if (!result) {
         return next(createError(401, "You are not allowed"));
@@ -28,19 +31,19 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.role = async (req, res, next) => {
-  try {
-    await exports.login(req, res, () => {}); // Call login middleware to check if user is authenticated
-    if (req.user.role !== "admin") {
-      return next(createError(403, "You are not allowed!"));
-    } else {
-      return next();
+exports.role = (req, res, next) => {
+  exports.login(req, res, (error) => {
+    if (error) {
+      return next(error);
     }
-  } catch (error) {
-    return next(createError(401, "You are not logged in"));
-  }
-};
 
+    if (req.user.isRescuer) {
+      next();
+    } else {
+      return next(createError(403, "You are not a Rescuer!"));
+    }
+  });
+};
 // LAMA DEV
 
 // import jwt from "jsonwebtoken";

@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      required: true,
+    },
     firstname: {
       type: String,
       required: true,
@@ -40,7 +44,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    isOwner: {
+    isRescuer: {
       type: Boolean,
       default: false,
     },
@@ -50,10 +54,12 @@ const UserSchema = new mongoose.Schema(
     },
     rescuedPuppies: {
       type: Number,
+      default: 0,
       required: false,
     },
     rating: {
       type: Number,
+      default: null,
       required: false,
     },
     role: {
