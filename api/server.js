@@ -14,7 +14,9 @@ app.use(bodyParser.urlencoded({ extended: true })); // third partie middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+
+app.use(cors({ origin: "https://puppyland.netlify.app", credentials: true }));
 
 //MIDLLEWARES
 app.use("/api", apiRoutes());
