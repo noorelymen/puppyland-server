@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const adoptionRoutes = require("./adoption");
+const adoptionsRoutes = require("./adoptions");
 const authRoutes = require("./auth");
 const breedRoutes = require("./breed");
 const conversationRoutes = require("./conversation");
@@ -11,14 +11,14 @@ const reviewRoutes = require("./review");
 const usersRoutes = require("./users");
 
 module.exports = () => {
-  router.use("/adoption", adoptionRoutes());
+  router.use("/adoptions", adoptionsRoutes());
   router.use("/auth", authRoutes());
   router.use("/breed", breedRoutes());
   router.use("/conversations", conversationRoutes());
   router.use("/messages", messageRoutes());
   router.use("/orders", orderRoutes());
   router.use("/puppies", puppiesRoutes());
-  router.use("/review", reviewRoutes());
+  router.use("/reviews", reviewRoutes());
   router.use("/users", usersRoutes());
   return router;
 };

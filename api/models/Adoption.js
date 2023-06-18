@@ -1,25 +1,22 @@
 const mongoose = require("mongoose");
 
 const AdoptionSchema = new mongoose.Schema({
-  ownerId: {
+  rescuerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-    unique: true,
   },
   adopterId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-    unique: true,
   },
   puppyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Puppy",
     required: true,
-    unique: true,
   },
-  img: {
+  photo: {
     type: String,
     required: false,
   },
@@ -37,6 +34,11 @@ const AdoptionSchema = new mongoose.Schema({
     default: "Pending",
   },
 });
+
+AdoptionSchema.index(
+  { rescuerId: 1, adopterId: 1, puppyId: 1 },
+  { unique: true }
+);
 
 const Adoption = mongoose.model("Adoption", AdoptionSchema);
 module.exports = Adoption;

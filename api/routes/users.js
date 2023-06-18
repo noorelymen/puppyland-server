@@ -9,7 +9,7 @@ module.exports = () => {
   router.get("/", UserController.getAllUsers);
 
   //GET USER BY ID
-  router.get("/:id", login, role, UserController.getUserById);
+  router.get("/:id", UserController.getUserById);
 
   //UPDATE AN EXISTING USER
   router.put("/:id", login, role, UserController.updateUser);

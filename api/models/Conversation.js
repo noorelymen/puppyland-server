@@ -7,7 +7,7 @@ const ConversationSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    ownerId: {
+    rescuerId: {
       type: String,
       required: true,
     },
@@ -15,7 +15,7 @@ const ConversationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    readByAdopter: {
+    readByRescuer: {
       type: Boolean,
       required: true,
     },

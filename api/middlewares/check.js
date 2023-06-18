@@ -17,6 +17,7 @@ exports.login = async (req, res, next) => {
         return res.status(401).send("Ivalid token");
       }
       const result = await User.findOne({ username: decoded.username });
+
       if (!result) {
         return next(createError(401, "You are not allowed"));
       } else {

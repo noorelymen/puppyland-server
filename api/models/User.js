@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
-    id: {
-      type: String,
-      required: true,
-    },
     firstname: {
       type: String,
       required: true,
@@ -57,10 +53,13 @@ const UserSchema = new mongoose.Schema(
       default: 0,
       required: false,
     },
-    rating: {
+    totalStars: {
       type: Number,
-      default: null,
-      required: false,
+      default: 0,
+    },
+    starNumber: {
+      type: Number,
+      default: 0,
     },
     role: {
       type: String,

@@ -9,7 +9,7 @@ exports.addNewPuppy = async (req, res, next) => {
     return next(createError(403, `Only rescuers can add new pets.`));
 
   const newPuppy = new Puppy({
-    userId: req.user._id.toString(),
+    rescuerId: req.user._id.toString(),
     ...req.body,
   });
 
@@ -27,7 +27,7 @@ exports.updatePuppy = async (req, res, next) => {
     const puppy = await Puppy.findById(req.params.id);
     if (!puppy) return next(createError(404, "Puppy not found!"));
 
-    if (puppy.userId !== req.user._id.toString())
+    if (puppy.rescuerId !== req.user._id.toString())
       return next(createError(403, "You can update your puppies only!"));
 
     const updatedPuppy = await Puppy.findByIdAndUpdate(
@@ -48,7 +48,7 @@ exports.deletePuppy = async (req, res, next) => {
     const puppy = await Puppy.findById(req.params.id);
     if (!puppy) return next(createError(404, "Puppy not found!"));
 
-    if (puppy.userId !== req.user._id.toString())
+    if (puppy.rescuerId !== req.user._id.toString())
       return next(createError(403, "You can delete your puppies only!"));
 
     await Puppy.findByIdAndDelete(req.params.id);

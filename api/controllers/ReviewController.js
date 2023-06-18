@@ -1,48 +1,57 @@
 const Review = require("../models/Review");
+const User = require("../models/User");
+const createError = require("../utils/error");
 
-//UPDATE AN EXISTING Review
-exports.updateReview = async (req, res, next) => {
+//CREATE A REVIEW
+exports.createReview = async (req, res, next) => {
+  //create a new Puppy
+  //if (req.user.isRescuer)
+  //return next(createError(403, `Rescuers can't add reviews.`));
+
+  const newReview = new Review({
+    userId: req.user._id.toString(),
+    puppyId: req.body.puppyId,
+    desc: req.body.desc,
+    star: req.body.star,
+  });
+
   try {
-    const updatedReview = await Review.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true } //because the find and update by id method is gonna return the unchanged object and we need it to return the object after the put method
-    );
-    res.status(200).json(updatedReview);
+    //if already reviewed can't review again
+    const review = await Review.findOne({
+      puppyId: req.body.puppyId,
+      userId: req.user._id,
+    });
+
+    if (review)
+      return next(createError(403, "You have already added a review."));
+
+    const savedReview = await newReview.save();
+
+    await User.findByIdAndUpdate(req.body.userId, {
+      $inc: { totalStars: req.body.star, starNumber: 1 },
+    });
+    res.status(201).json(savedReview);
   } catch (err) {
     next(err);
   }
 };
 
-//DELETE AN EXISTING Review
+//GET REVIEWS
+exports.getReviews = async (req, res, next) => {
+  try {
+    const reviews = await Review.find({ puppyId: req.params.puppyId });
+    res.status(200).json(reviews);
+  } catch (err) {
+    next(err);
+  }
+};
+
+//DELETE A REVIEW
 exports.deleteReview = async (req, res, next) => {
   try {
     await Review.findByIdAndDelete(req.params.id);
     res.status(200).json("Review deleted.");
   } catch (err) {
     next(err);
-  }
-};
-
-//GET AN EXISITNG Review
-exports.getReviewById = async (req, res, next) => {
-  try {
-    const Review = await Review.findById(req.params.id);
-    res.status(200).json(Review);
-  } catch (err) {
-    next(err);
-  }
-};
-
-//GET ALL ReviewS
-exports.getAllReviews = async (req, res, next) => {
-  try {
-    const Reviews = await Review.find();
-    res.status(200).json({
-      msg: "Reviews get with success",
-      Reviews,
-    });
-  } catch (err) {
-    res.status(500).send(err.Review);
   }
 };

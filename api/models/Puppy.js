@@ -55,7 +55,7 @@ const PuppySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    userId: {
+    rescuerId: {
       type: String,
       required: true,
     },

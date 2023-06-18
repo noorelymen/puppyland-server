@@ -1,48 +1,44 @@
 const Message = require("../models/Message");
+const Conversation = require("../models/Conversation");
 
-//UPDATE AN EXISTING Message
-exports.updateMessage = async (req, res, next) => {
+//CREATE MESSAGE
+exports.createMessage = async (req, res, next) => {
+  const newMessage = new Message({
+    conversationId: req.body.conversationId,
+    userId: req.user._id.toString(),
+    message: req.body.message,
+  });
+
   try {
-    const updatedMessage = await Message.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true } //because the find and update by id method is gonna return the unchanged object and we need it to return the object after the put method
+    const savedMessage = await newMessage.save();
+    await Conversation.findOneAndUpdate(
+      { _id: req.body.conversationId },
+      {
+        $set: {
+          readbyRescuer: req.user.isRescuer,
+          readByAdopter: !req.user.isRescuer,
+          lastMessage: req.body.message,
+        },
+      },
+      {
+        new: true,
+      }
     );
-    res.status(200).json(updatedMessage);
+
+    console.log("SAVED MESSAGE");
+    console.log(savedMessage);
+    res.status(201).send(savedMessage);
   } catch (err) {
     next(err);
   }
 };
 
-//DELETE AN EXISTING Message
-exports.deleteMessage = async (req, res, next) => {
+//GET ALL MESSAGES
+exports.getMessages = async (req, res, next) => {
   try {
-    await Message.findByIdAndDelete(req.params.id);
-    res.status(200).json("Message deleted.");
+    const messages = await Message.find({ conversationId: req.params.id });
+    res.status(200).json({ messages });
   } catch (err) {
     next(err);
-  }
-};
-
-//GET AN EXISITNG Message
-exports.getMessageById = async (req, res, next) => {
-  try {
-    const Message = await Message.findById(req.params.id);
-    res.status(200).json(Message);
-  } catch (err) {
-    next(err);
-  }
-};
-
-//GET ALL MessageS
-exports.getAllMessages = async (req, res, next) => {
-  try {
-    const Messages = await Message.find();
-    res.status(200).json({
-      msg: "Messages get with success",
-      Messages,
-    });
-  } catch (err) {
-    res.status(500).send(err.message);
   }
 };
